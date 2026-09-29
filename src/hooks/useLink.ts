@@ -10,6 +10,7 @@ import {
 } from "~/utils"
 import { useRouter, useUtil } from "."
 import { cookieStorage } from "@solid-primitives/storage"
+import { getLinkHost } from "./linkHost"
 
 type URLType = "preview" | "direct" | "proxy"
 
@@ -42,6 +43,7 @@ export const getLinkByDirAndObj = (
     path = `${dir}/${archive.name}`
     path = encodePath(path, encodeAll)
   }
+  host = getLinkHost(host, prefix, import.meta.env.VITE_DOWNLOAD_URL)
   let QP = () => {
     QP = () => "&"
     return "?"
