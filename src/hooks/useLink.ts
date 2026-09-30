@@ -10,7 +10,7 @@ import {
 } from "~/utils"
 import { useRouter, useUtil } from "."
 import { cookieStorage } from "@solid-primitives/storage"
-import { getLinkHost } from "./linkHost"
+import { buildLinkUrl, resolveObjectPath } from "./linkPath"
 
 type URLType = "preview" | "direct" | "proxy"
 
@@ -29,7 +29,6 @@ export const getLinkByDirAndObj = (
 
   dir = standardizePath(dir, true)
   let path = `${dir}/${obj.name}`
-  path = encodePath(path, encodeAll)
   let host = api
   let prefix = isShare ? "/sd" : type === "direct" ? "/d" : "/p"
   if (type === "preview") {
@@ -41,14 +40,18 @@ export const getLinkByDirAndObj = (
   if (archive) {
     prefix = "/ae"
     path = `${dir}/${archive.name}`
-    path = encodePath(path, encodeAll)
   }
-  host = getLinkHost(host, prefix, import.meta.env.VITE_DOWNLOAD_URL)
   let QP = () => {
     QP = () => "&"
     return "?"
   }
-  let ans = `${host}${prefix}${path}`
+  let ans = buildLinkUrl(
+    host,
+    import.meta.env.VITE_DOWNLOAD_URL,
+    prefix,
+    path,
+    encodeAll,
+  )
   if (type !== "preview" && !isShare && obj.sign) {
     ans += `${QP()}sign=${obj.sign}`
   }
@@ -69,15 +72,16 @@ export const getLinkByDirAndObj = (
 export const useLink = () => {
   const { pathname, isShare } = useRouter()
   const getLinkByObj = (obj: Obj, type?: URLType, encodeAll?: boolean) => {
-    let dir: string
-    if (objStore.state === State.File) {
-      dir = pathDir(pathname())
-      if (isShare() && dir === "/@s") {
-        dir = pathname()
-        obj = { ...obj, name: "" }
-      }
-    } else {
-      dir = pathname()
+    const currentPath = pathname()
+    const objectPath = resolveObjectPath(
+      currentPath,
+      objStore.state === State.File ? "file" : "folder",
+      obj.name,
+    )
+    let dir = pathDir(objectPath)
+    if (isShare() && objStore.state === State.File && dir === "/@s") {
+      dir = currentPath
+      obj = { ...obj, name: "" }
     }
     return getLinkByDirAndObj(dir, obj, type, isShare(), encodeAll)
   }

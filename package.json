@@ -28,7 +28,7 @@
     "start": "vite",
     "dev": "vite --force",
     "build": "vite build",
-    "test:links": "node --experimental-strip-types --test scripts/link-host.test.mjs",
+    "test:links": "node --experimental-strip-types --test scripts/link-generation.test.mjs",
     "build:lite": "cross-env VITE_LITE=true vite build",
     "serve": "vite preview",
     "prepare": "husky",
