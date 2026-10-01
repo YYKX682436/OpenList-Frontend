@@ -14,6 +14,7 @@ import {
   TorrentRapidUploadResult,
 } from "~/types"
 import { r } from "."
+import { fsRequestPathHeaders } from "./fsRequestPath"
 
 export const fsGet = (
   path: string = "/",
@@ -28,6 +29,7 @@ export const fsGet = (
     },
     {
       cancelToken: cancelToken,
+      headers: fsRequestPathHeaders(path),
     },
   )
 }
@@ -50,6 +52,7 @@ export const fsList = (
     },
     {
       cancelToken: cancelToken,
+      headers: fsRequestPathHeaders(path),
     },
   )
 }

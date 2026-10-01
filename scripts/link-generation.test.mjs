@@ -5,6 +5,7 @@ import {
   resolveLinkObjectPath,
   resolveObjectPath,
 } from "../src/hooks/linkPath.ts"
+import { fsRequestPathHeaders } from "../src/utils/fsRequestPath.ts"
 
 const management = "https://openlist.example"
 const download = "https://dl.example"
@@ -133,6 +134,16 @@ test("encoded and unencoded direct copies retain the same path segments", () => 
     buildLinkUrl(management, download, "/d", rawPath, false),
     `${download}/d${rawPath}`,
   )
+})
+
+test("fs request path fallback header is ASCII encoded and preserves the logical path", () => {
+  const logicalPath = "/中国移动云盘/安卓定制V/8076多开_k_n.apk"
+  const headers = fsRequestPathHeaders(logicalPath)
+  assert.equal(
+    headers["X-OpenList-Path"],
+    "%2F%E4%B8%AD%E5%9B%BD%E7%A7%BB%E5%8A%A8%E4%BA%91%E7%9B%98%2F%E5%AE%89%E5%8D%93%E5%AE%9A%E5%88%B6V%2F8076%E5%A4%9A%E5%BC%80_k_n.apk",
+  )
+  assert.equal(decodeURIComponent(headers["X-OpenList-Path"]), logicalPath)
 })
 
 test("preview page stays on management host", () => {
