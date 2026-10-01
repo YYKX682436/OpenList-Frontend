@@ -12,6 +12,7 @@ export enum ObjType {
 
 export interface Obj {
   name: string
+  raw_path?: string
   size: number
   is_dir: boolean
   created: string

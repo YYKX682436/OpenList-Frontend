@@ -14,13 +14,30 @@ export const resolveObjectPath = (
   objName: string,
 ) => {
   const currentPath = withoutTrailingSlash(pathname || "/")
-  const currentName = currentPath.split("/").pop()
-
-  if (state === "file" && currentName === objName) {
-    return currentPath
-  }
-
+  if (state === "file") return currentPath
   return `${currentPath === "/" ? "" : currentPath}/${objName}` || "/"
+}
+
+const withoutLeadingSlash = (path: string) => path.replace(/^\/+/, "")
+
+/**
+ * Resolve the complete path used to build a normal link. Backend raw_path is
+ * already canonical and must never receive base_path again. The fallback is
+ * for older backends and applies base_path once to the complete object path.
+ */
+export const resolveLinkObjectPath = (
+  pathname: string,
+  state: LinkPathState,
+  objName: string,
+  basePath: string,
+  rawPath?: string,
+) => {
+  if (rawPath) return rawPath.startsWith("/") ? rawPath : `/${rawPath}`
+
+  const objectPath = resolveObjectPath(pathname, state, objName)
+  const normalizedBase = withoutTrailingSlash(basePath || "")
+  if (!normalizedBase || normalizedBase === "/") return objectPath
+  return `${normalizedBase}/${withoutLeadingSlash(objectPath)}`
 }
 
 export const encodeLinkPath = (path: string, encodeAll?: boolean) =>
