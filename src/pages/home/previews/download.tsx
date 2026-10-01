@@ -23,7 +23,7 @@ export const Download = (props: { openWith?: boolean }) => {
   const { copyCurrentRawLink } = useCopyLink()
   const { currentObjLink } = useLink()
   const [qrUrl, setQrUrl] = createSignal("")
-  QRCode.toDataURL(currentObjLink(), {
+  QRCode.toDataURL(currentObjLink(true), {
     type: "image/jpeg",
     scale: 2,
   }).then((url) => setQrUrl(url))
